@@ -4,21 +4,21 @@ A command aliasing tool using symlinks and S-expression configuration.
 
 ## SYNOPSIS
 
-**allyas** [*command*]
+**ally** [*command*]
 
 ## DESCRIPTION
 
-**allyas** provides command aliasing through symlinks. Commands are defined in an S-expression configuration file and executed when the binary is invoked under different names.
+**ally** provides command aliasing through symlinks. Commands are defined in an S-expression configuration file and executed when the binary is invoked under different names.
 
 The tool operates in three modes:
 
-- **allyas**: Display help
+- **ally**: Display help
 - **shim**: Create symlinks for all configured aliases  
 - *alias*: Execute configured command (any other name)
 
 ## CONFIGURATION
 
-Set the **ALLYAS_CONF** environment variable to specify the configuration file path.
+Set the **ALLY_CONF** environment variable to specify the configuration file path.
 
 Configuration uses S-expression syntax:
 
@@ -31,13 +31,13 @@ Configuration uses S-expression syntax:
 
 ## ENVIRONMENT
 
-**ALLYAS_CONF**
+**ALLY_CONF**
 : Path to configuration file (required)
 
-**ALLYAS_SHIM_DIR**  
+**ALLY_SHIM_DIR**  
 : Directory for symlink creation (required for automatic symlink creation)
 
-**ALLYAS_VERBOSE**
+**ALLY_VERBOSE**
 : Enable verbose output when set to "true"
 
 **SHELL**
@@ -47,18 +47,18 @@ Configuration uses S-expression syntax:
 
 1. Create configuration file:
    ```bash
-   export ALLYAS_CONF=/path/to/config.conf
+   export ALLY_CONF=/path/to/config.conf
    ```
 
 2. Place executable in your `$PATH`:
    ```bash
-   mv allyas ~/bin/ # if you have ~/bin in your $PATH
+   mv ally ~/bin/ # if you have ~/bin in your $PATH
    ```
 
 3. Create symlinks:
    ```bash
-   export ALLYAS_SHIM_DIR=/path/to/shims
-   allyas shim
+   export ALLY_SHIM_DIR=/path/to/shims
+   ally shim
    ```
 
 4. Use aliases:
@@ -98,9 +98,9 @@ It works well with [direnv](https://direnv.net).
 Configure `.envrc` like this:
 
 ```sh
-export ALLYAS_CONF=$(pwd)/.allyconf
-export ALLYAS_SHIM_DIR=$(pwd)/.aliases
-PATH=${PATH}:$ALLYAS_SHIM_DIR
+export ALLY_CONF=$(pwd)/.allyconf
+export ALLY_SHIM_DIR=$(pwd)/.aliases
+PATH=${PATH}:$ALLY_SHIM_DIR
 ```
 
 Then prepare configuration file:
@@ -112,7 +112,7 @@ Then prepare configuration file:
 Finally set symlink and it works well:
 
 ```sh
-allyas shim
+ally shim
 ```
 
 ## BUILDING

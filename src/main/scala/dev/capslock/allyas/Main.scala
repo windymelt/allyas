@@ -16,7 +16,7 @@ case class Config(
 
 object Main {
   val command = Command(
-    name = "allyas",
+    name = "ally",
     header = "A command aliasing tool"
   )(Opts.unit)
 
@@ -30,18 +30,18 @@ object Main {
     if (args.length > 0 && args(0) == "shim") {
       val exitCode = runShim()
       sys.exit(exitCode)
-    } else if (whoami == "allyas") {
+    } else if (whoami == "ally") {
       command.parse(args.toList) match {
         case Left(help) =>
           eprintln(help.toString)
           sys.exit(1)
         case Right(_) =>
-          val config = Config(Environments.ALLYAS_CONF)
+          val config = Config(Environments.ALLY_CONF)
           val exitCode = run(config, Array.empty)
           sys.exit(exitCode)
       }
     } else {
-      val config = Config(Environments.ALLYAS_CONF)
+      val config = Config(Environments.ALLY_CONF)
       val exitCode = run(config, args)
       sys.exit(exitCode)
     }
@@ -51,12 +51,12 @@ object Main {
     val confFile = config.configFile match {
       case Some(file) => file
       case None =>
-        eprintln("*** Allyas: Please set the ALLYAS_CONF environment variable.")
+        eprintln("*** Ally: Please set the ALLY_CONF environment variable.")
         return 1
     }
 
-    if (Environments.ALLYAS_VERBOSE) {
-      eprintln(s"*** Allyas: Using config file: $confFile")
+    if (Environments.ALLY_VERBOSE) {
+      eprintln(s"*** Ally: Using config file: $confFile")
     }
 
     val confString =
@@ -64,7 +64,7 @@ object Main {
         os.read(os.Path(confFile, os.pwd))
       } catch {
         case e: Exception =>
-          eprintln(s"*** Allyas: Error reading config file: ${e.getMessage}")
+          eprintln(s"*** Ally: Error reading config file: ${e.getMessage}")
           return 1
       }
 
@@ -72,7 +72,7 @@ object Main {
     val conf = parser.parse(parser.config, confString)
 
     if (!conf.successful) {
-      eprintln(s"*** Allyas: Error parsing config file: ${conf.toString}")
+      eprintln(s"*** Ally: Error parsing config file: ${conf.toString}")
       return 1
     }
 
@@ -91,8 +91,8 @@ object Main {
           cmd
         }
 
-        if (Environments.ALLYAS_VERBOSE) {
-          eprintln(s"*** Allyas: Executing command: $fullCommand")
+        if (Environments.ALLY_VERBOSE) {
+          eprintln(s"*** Ally: Executing command: $fullCommand")
         }
         val shell = sys.env.get("SHELL").getOrElse("sh")
         val proc = os
@@ -105,7 +105,7 @@ object Main {
           )
         proc.exitCode
       case None =>
-        eprintln(s"*** Allyas: Unknown command: $whoami")
+        eprintln(s"*** Ally: Unknown command: $whoami")
         eprintln("Available commands:")
         conf.get.keys.foreach(eprintln)
         127
@@ -113,27 +113,27 @@ object Main {
   }
 
   def runShim(): Int = {
-    if (Environments.ALLYAS_CONF.isEmpty) {
-      eprintln("*** Allyas: Please set the ALLYAS_CONF environment variable.")
+    if (Environments.ALLY_CONF.isEmpty) {
+      eprintln("*** Ally: Please set the ALLY_CONF environment variable.")
       return 1
     }
 
-    if (Environments.ALLYAS_SHIM_DIR.isEmpty) {
+    if (Environments.ALLY_SHIM_DIR.isEmpty) {
       eprintln(
-        "*** Allyas: Please set the ALLYAS_SHIM_DIR environment variable."
+        "*** Ally: Please set the ALLY_SHIM_DIR environment variable."
       )
       return 1
     }
 
-    val confFile = Environments.ALLYAS_CONF.get
-    val shimDir = Environments.ALLYAS_SHIM_DIR.get
+    val confFile = Environments.ALLY_CONF.get
+    val shimDir = Environments.ALLY_SHIM_DIR.get
 
     val confString =
       try {
         os.read(os.Path(confFile, os.pwd))
       } catch {
         case e: Exception =>
-          eprintln(s"*** Allyas: Error reading config file: ${e.getMessage}")
+          eprintln(s"*** Ally: Error reading config file: ${e.getMessage}")
           return 1
       }
 
@@ -141,7 +141,7 @@ object Main {
     val conf = parser.parse(parser.config, confString)
 
     if (!conf.successful) {
-      eprintln(s"*** Allyas: Error parsing config file: ${conf.toString}")
+      eprintln(s"*** Ally: Error parsing config file: ${conf.toString}")
       return 1
     }
 
@@ -172,7 +172,7 @@ object Main {
       0
     } catch {
       case e: Exception =>
-        eprintln(s"*** Allyas: Error creating symlinks: ${e.getMessage}")
+        eprintln(s"*** Ally: Error creating symlinks: ${e.getMessage}")
         1
     }
   }

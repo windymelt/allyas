@@ -1,5 +1,7 @@
 scalaVersion := "3.3.6" // A Long Term Support version.
 
+name := "ally"
+
 enablePlugins(ScalaNativePlugin)
 
 // set to Debug for compilation details (Info is default)
