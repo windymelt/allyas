@@ -2,6 +2,8 @@
 
 A command aliasing tool using symlinks and S-expression configuration.
 
+![image](./ally.png)
+
 ## SYNOPSIS
 
 **ally** [*command*]
