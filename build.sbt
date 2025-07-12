@@ -17,4 +17,5 @@ nativeConfig ~= { c =>
 
 libraryDependencies += "org.scala-lang.modules" %%% "scala-parser-combinators" % "2.4.0"
 libraryDependencies += "com.lihaoyi" %%% "os-lib" % "0.11.4"
+libraryDependencies += "com.monovore" %%% "decline" % "2.5.0"
 libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.19" % Test
