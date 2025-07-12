@@ -11,36 +11,43 @@ import cats.implicits.*
 inline def eprintln(msg: String): Unit = Console.err.println(msg)
 
 case class Config(
-    configFile: Option[String],
-    verbose: Boolean = false
+    configFile: Option[String]
 )
 
 object Main {
-  val verboseFlag = Opts.flag("verbose", "Enable verbose output", "v").orFalse
-
   val command = Command(
     name = "allyas",
     header = "A command aliasing tool"
-  )(verboseFlag)
+  )(Opts.unit)
 
   def main(args: Array[String]): Unit = {
+    val whoami = if (filename.startsWith("/")) {
+      os.Path(filename).baseName
+    } else {
+      os.RelPath(filename).baseName
+    }
+
     if (args.length > 0 && args(0) == "shim") {
       val exitCode = runShim()
       sys.exit(exitCode)
-    } else {
+    } else if (whoami == "allyas") {
       command.parse(args.toList) match {
         case Left(help) =>
           eprintln(help.toString)
           sys.exit(1)
-        case Right(verbose) =>
-          val config = Config(Environments.ALLYAS_CONF, verbose)
-          val exitCode = run(config)
+        case Right(_) =>
+          val config = Config(Environments.ALLYAS_CONF)
+          val exitCode = run(config, Array.empty)
           sys.exit(exitCode)
       }
+    } else {
+      val config = Config(Environments.ALLYAS_CONF)
+      val exitCode = run(config, args)
+      sys.exit(exitCode)
     }
   }
 
-  def run(config: Config): Int = {
+  def run(config: Config, args: Array[String] = Array.empty): Int = {
     val confFile = config.configFile match {
       case Some(file) => file
       case None =>
@@ -48,7 +55,7 @@ object Main {
         return 1
     }
 
-    if (config.verbose) {
+    if (Environments.ALLYAS_VERBOSE) {
       eprintln(s"*** Allyas: Using config file: $confFile")
     }
 
@@ -75,19 +82,21 @@ object Main {
       os.RelPath(filename).baseName
     }
 
-    if (whoami == "allyas") {
-      println(command.showHelp)
-      return 0
-    }
-
     conf.get.get(whoami) match {
       case Some(cmd) =>
-        if (config.verbose) {
-          eprintln(s"*** Allyas: Executing command: $cmd")
+        val quotedArgs = args.map(arg => s"'${arg.replace("'", "'\\''")}'")
+        val fullCommand = if (quotedArgs.nonEmpty) {
+          s"$cmd ${quotedArgs.mkString(" ")}"
+        } else {
+          cmd
+        }
+
+        if (Environments.ALLYAS_VERBOSE) {
+          eprintln(s"*** Allyas: Executing command: $fullCommand")
         }
         val shell = sys.env.get("SHELL").getOrElse("sh")
         val proc = os
-          .proc(shell, "-c", cmd)
+          .proc(shell, "-c", fullCommand)
           .call(
             cwd = os.pwd,
             stdin = os.Inherit,
